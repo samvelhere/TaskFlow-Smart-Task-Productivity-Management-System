@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ error_title or "Something went wrong" }} — TaskFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='taskflow.css') }}">
+<style>
+body{display:grid;place-items:center;min-height:100vh;padding:24px}
+.err-box{max-width:440px;text-align:center}
+.err-code{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:64px;height:64px;border-radius:18px;background:var(--rust-soft);color:var(--rust);
+  font-family:var(--mono);font-weight:700;font-size:18px;margin-bottom:22px;
+}
+.err-box h1{font-size:26px}
+.err-box p{margin-top:10px;color:var(--ink-muted);font-size:14px;line-height:1.6}
+.err-actions{display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+  <div class="err-box">
+    <div class="err-code">{{ error_code or "!" }}</div>
+    <h1>{{ error_title or "Something went wrong" }}</h1>
+    <p>{{ error_message or "TaskFlow could not complete this request. Please try again." }}</p>
+    <div class="err-actions">
+      <a href="{{ url_for('hello') }}" class="btn btn-primary">Back to dashboard</a>
+      <a href="javascript:history.back()" class="btn btn-secondary">Go back</a>
+    </div>
+  </div>
+</body>
+</html>

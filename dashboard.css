@@ -1,0 +1,204 @@
+/* ============================================================
+   DASHBOARD / CALENDAR / ACTIVITY / NOTIFICATIONS
+   Page-specific styles, built on top of taskflow.css tokens.
+============================================================ */
+
+/* ---------- Welcome + quick add ---------- */
+.welcome-title{font-size:30px}
+.welcome-text{margin-top:8px;color:var(--ink-muted);font-size:14px}
+
+.quick-add{
+  margin-top:26px;padding:20px 22px;border-radius:var(--radius-lg);
+  background:var(--accent);color:var(--on-accent);
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+.quick-add-content{display:flex;align-items:center;gap:14px}
+.quick-add-icon{
+  width:42px;height:42px;border-radius:11px;background:rgba(253,252,248,.16);
+  display:grid;place-items:center;font-size:16px;flex-shrink:0;
+}
+.quick-add-title{font-weight:700;font-size:14.5px}
+.quick-add-text{margin-top:3px;font-size:12.5px;color:rgba(253,252,248,.72)}
+.quick-add .btn-primary{background:var(--on-accent);color:var(--accent-dark)}
+.quick-add .btn-primary:hover{background:#eeece3}
+
+/* ---------- Stats ---------- */
+.stats-grid{margin-top:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{padding:18px 20px;border-radius:var(--radius-md)}
+.stat-top{display:flex;justify-content:space-between;align-items:center}
+.stat-label{font-size:12px;font-weight:700;color:var(--ink-muted)}
+.stat-icon{color:var(--accent);font-size:14px}
+.stat-number{margin-top:10px;font-family:var(--display);font-size:32px;font-weight:600}
+.stat-desc{margin-top:4px;font-size:11.5px;color:var(--ink-faint)}
+@media (max-width:880px){.stats-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.stats-grid{grid-template-columns:1fr}}
+
+/* ---------- Task toolbar ---------- */
+.task-toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:220px}
+.search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-size:13px}
+.search-wrap input{
+  width:100%;height:44px;padding:0 14px 0 38px;border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);background:var(--surface);font-size:13.5px;
+}
+.filter-select{
+  height:44px;padding:0 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+  background:var(--surface);font-size:13.5px;
+}
+
+/* ---------- Task list ---------- */
+.task-list{display:flex;flex-direction:column;gap:12px}
+.task-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  border-left:4px solid var(--border-strong);padding:18px 20px;
+}
+.task-card.priority-low{border-left-color:var(--accent)}
+.task-card.priority-medium{border-left-color:var(--sky)}
+.task-card.priority-high{border-left-color:var(--amber)}
+.task-card.priority-urgent{border-left-color:var(--rust)}
+.task-card.is-completed{opacity:.62}
+
+.task-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.task-title{font-size:15.5px;font-weight:700}
+.task-card.is-completed .task-title{text-decoration:line-through}
+.task-desc{margin-top:6px;font-size:13px;color:var(--ink-muted);max-width:60ch}
+.task-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.task-meta .pill{font-family:var(--mono);font-weight:600}
+.task-due{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-muted);font-family:var(--mono)}
+.task-due.is-overdue{color:var(--rust);font-weight:700}
+
+.task-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* ---------- Subtasks ---------- */
+.subtask-block{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.subtask-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.subtask-track{flex:1;height:6px;border-radius:999px;background:var(--surface-alt);overflow:hidden}
+.subtask-fill{height:100%;background:var(--accent);border-radius:999px}
+.subtask-count{font-size:11.5px;color:var(--ink-muted);white-space:nowrap}
+.subtask-row{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px}
+.subtask-row.is-done .subtask-name{text-decoration:line-through;color:var(--ink-faint)}
+.subtask-name{flex:1;min-width:0}
+.subtask-due{
+  display:inline-flex;align-items:center;gap:4px;margin-top:2px;
+  font-size:10.5px;font-family:var(--mono);color:var(--ink-faint);
+}
+.subtask-due.is-overdue{color:var(--rust)}
+.subtask-check{
+  width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-strong);
+  display:grid;place-items:center;flex-shrink:0;background:var(--surface);color:transparent;font-size:11px;
+}
+.subtask-row.is-done .subtask-check{background:var(--accent);border-color:var(--accent);color:#fff}
+.subtask-date-btn{
+  width:26px;height:26px;border-radius:6px;border:0;background:transparent;color:var(--ink-faint);
+  display:grid;place-items:center;flex-shrink:0;
+}
+.subtask-date-btn:hover{background:var(--sky-soft);color:var(--sky)}
+.subtask-date-btn.has-date{color:var(--sky)}
+.subtask-add-row{display:flex;gap:8px;margin-top:10px}
+.subtask-del{
+  width:26px;height:26px;border-radius:6px;border:0;background:transparent;color:var(--ink-faint);
+  display:grid;place-items:center;flex-shrink:0;
+}
+.subtask-del:hover{background:var(--rust-soft);color:var(--rust)}
+
+/* ---------- Confirm modal ---------- */
+.confirm-icon{
+  width:46px;height:46px;border-radius:12px;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-dark);font-size:17px;margin-bottom:14px;
+}
+.confirm-icon.danger{background:var(--rust-soft);color:var(--rust)}
+
+/* ---------- Notifications dropdown (topbar) ---------- */
+.notif-panel{
+  position:absolute;top:74px;right:40px;width:360px;max-height:70vh;overflow-y:auto;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-md);display:none;z-index:50;
+}
+.notif-panel.open{display:block}
+.notif-panel-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;border-bottom:1px solid var(--border);
+}
+.notif-panel-head h3{font-size:14px}
+.notif-item{display:flex;gap:10px;padding:13px 16px;border-bottom:1px solid var(--surface-alt)}
+.notif-item:last-child{border-bottom:0}
+.notif-icon{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent-dark);display:grid;place-items:center;flex-shrink:0;font-size:12px}
+.notif-icon.overdue{background:var(--rust-soft);color:var(--rust)}
+.notif-body{min-width:0;flex:1}
+.notif-title{font-size:12.5px;font-weight:700}
+.notif-msg{margin-top:2px;font-size:12px;color:var(--ink-muted);overflow-wrap:anywhere}
+.notif-time{margin-top:4px;font-size:10.5px;color:var(--ink-faint);font-family:var(--mono)}
+.notif-empty{padding:34px 16px;text-align:center;color:var(--ink-faint);font-size:12.5px}
+@media (max-width:520px){.notif-panel{right:14px;left:14px;width:auto}}
+
+/* ---------- Notifications page ---------- */
+.notif-group-label{
+  margin:22px 0 10px;font-size:11px;font-weight:700;letter-spacing:.04em;
+  color:var(--ink-faint);text-transform:uppercase;
+}
+.notif-group-label:first-child{margin-top:0}
+.notif-row{
+  display:grid;grid-template-columns:38px 1fr auto;gap:14px;align-items:flex-start;
+  padding:16px 4px;border-bottom:1px solid var(--border);
+}
+.notif-row:last-child{border-bottom:0}
+.notif-row.is-unread{background:var(--accent-soft);margin:0 -16px;padding:16px;border-radius:var(--radius-sm);border-bottom-color:transparent}
+.notif-row-icon{width:38px;height:38px;border-radius:10px;background:var(--surface-alt);color:var(--ink-muted);display:grid;place-items:center}
+.notif-row-icon.overdue{background:var(--rust-soft);color:var(--rust)}
+.notif-row-icon.reminder{background:var(--sky-soft);color:var(--sky)}
+
+/* ---------- Activity page ---------- */
+.activity-group-label{
+  margin:24px 0 12px;font-size:11px;font-weight:700;letter-spacing:.04em;
+  color:var(--ink-faint);text-transform:uppercase;
+}
+.activity-group-label:first-child{margin-top:0}
+.activity-row{display:flex;gap:14px;padding:13px 4px}
+.activity-dot{
+  width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0;
+}
+.activity-dot.deleted{background:var(--rust)}
+.activity-dot.overdue{background:var(--amber)}
+.activity-line{flex:1;border-bottom:1px solid var(--border);padding-bottom:13px}
+.activity-title{font-size:13.5px;font-weight:700}
+.activity-detail{margin-top:3px;font-size:12.5px;color:var(--ink-muted)}
+.activity-time{margin-top:5px;font-size:11px;color:var(--ink-faint);font-family:var(--mono)}
+
+/* ---------- Calendar page ---------- */
+.cal-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+.cal-nav{display:flex;align-items:center;gap:10px}
+.cal-month-label{font-family:var(--display);font-size:19px;min-width:170px;text-align:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-weekday{padding:10px 6px;text-align:center;font-size:11px;font-weight:700;color:var(--ink-faint);border-bottom:1px solid var(--border)}
+.cal-cell{
+  min-height:96px;padding:8px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  cursor:pointer;background:var(--surface);
+}
+.cal-cell:nth-child(7n){border-right:0}
+.cal-cell.is-out{background:var(--surface-alt);color:var(--ink-faint)}
+.cal-cell.is-today{background:var(--accent-soft)}
+.cal-cell.has-selection{outline:2px solid var(--accent);outline-offset:-2px}
+.cal-date-num{font-size:12.5px;font-weight:700}
+.cal-dots{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
+.cal-dot{width:6px;height:6px;border-radius:50%}
+.cal-dot.low{background:var(--accent)}
+.cal-dot.medium{background:var(--sky)}
+.cal-dot.high{background:var(--amber)}
+.cal-dot.urgent{background:var(--rust)}
+.cal-dot.is-reminder{border-radius:2px;transform:rotate(45deg)}
+.cal-day-panel{margin-top:22px}
+.cal-day-task{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:13px 4px;border-bottom:1px solid var(--border);
+}
+.cal-day-task:last-child{border-bottom:0}
+.cal-day-task-sub{margin-top:3px;font-size:12px;color:var(--ink-muted)}
+.cal-day-task-sub.is-reminder{color:var(--sky);font-weight:600}
+@media (max-width:700px){
+  .cal-cell{min-height:64px}
+  .cal-date-num{font-size:11px}
+}
+
+/* ---------- Delete-reason modal ---------- */
+.reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+@media (max-width:480px){.reason-grid{grid-template-columns:1fr}}

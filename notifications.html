@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}TaskFlow | Notifications{% endblock %}
+{% block page_title %}Notification history{% endblock %}
+
+{% block topbar_extra %}
+<button type="button" class="btn btn-secondary btn-sm" id="markAllBtn">
+  <i class="fa-solid fa-check-double"></i> Mark all as read
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h2 class="section-title">All notifications</h2>
+    <p class="section-subtitle">Current and past notifications. Read ones stay here for your history.</p>
+  </div>
+</div>
+
+<div class="search-wrap" style="margin-bottom:18px;max-width:420px">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" id="notifSearch" placeholder="Search notifications or task names…">
+</div>
+
+<div class="card" style="padding:6px 22px" id="notifListCard">
+  {% if notifications %}
+    {% set ns = namespace(last_label=None) %}
+    {% for item in notifications %}
+      {% set group_label = item.created_at.strftime('%d %b %Y') if item.created_at else "Unknown date" %}
+      {% if group_label != ns.last_label %}
+        <div class="notif-group-label">{{ group_label }}</div>
+        {% set ns.last_label = group_label %}
+      {% endif %}
+      <div class="notif-row {{ 'is-unread' if not item.is_read }}"
+           data-id="{{ item.id }}"
+           data-search="{{ (item.title ~ ' ' ~ (item.message or '') ~ ' ' ~ item.notification_type)|lower|e }}">
+        <div class="notif-row-icon {{ 'overdue' if item.notification_type == 'task_overdue' else ('reminder' if item.notification_type == 'task_reminder' else '') }}">
+          <i class="fa-solid {{ 'fa-triangle-exclamation' if item.notification_type == 'task_overdue' else 'fa-bell' }}"></i>
+        </div>
+        <div>
+          <div class="notif-title" style="font-size:13px">{{ item.title }}</div>
+          {% if item.message %}<div class="notif-msg" style="margin-top:4px">{{ item.message }}</div>{% endif %}
+          <div class="notif-time" style="margin-top:6px">{{ item.created_at.strftime('%I:%M %p') if item.created_at else "" }}</div>
+        </div>
+        {% if not item.is_read %}
+        <button type="button" class="btn btn-secondary btn-sm mark-read-btn" data-id="{{ item.id }}">
+          <i class="fa-solid fa-check"></i> Mark read
+        </button>
+        {% else %}
+        <span class="pill pill-status" style="align-self:center">Read</span>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <i class="fa-regular fa-bell"></i>
+      <h3>No notifications yet</h3>
+      <p>Your reminders and overdue alerts will appear here.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='notifications.js') }}"></script>
+{% endblock %}

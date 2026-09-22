@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create your account — TaskFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='taskflow.css') }}">
+<style>
+.auth-page{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;padding:24px}
+.auth-intro{
+  position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;
+  min-height:calc(100vh - 48px);padding:clamp(32px,6vw,76px);
+  background:var(--accent);color:var(--on-accent);border-radius:var(--radius-lg);
+}
+.auth-intro::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-180px;top:-160px;background:rgba(253,252,248,.06)}
+.auth-intro::after{content:"";position:absolute;width:300px;height:300px;border-radius:50%;left:-150px;bottom:-140px;background:rgba(253,252,248,.04)}
+.auth-brand{position:relative;z-index:1;display:inline-flex;align-items:center;gap:10px;margin-bottom:50px}
+.auth-mark{width:38px;height:38px;border-radius:10px;background:rgba(253,252,248,.13);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:19px}
+.auth-brandname{font-family:var(--display);font-size:22px;font-weight:600}
+.auth-h1{position:relative;z-index:1;max-width:560px;font-size:clamp(34px,4.6vw,58px);line-height:1.05;font-weight:600;letter-spacing:-.02em}
+.auth-desc{position:relative;z-index:1;max-width:460px;margin-top:18px;color:rgba(253,252,248,.75);font-size:15.5px}
+.auth-steps{position:relative;z-index:1;margin-top:38px;display:flex;flex-direction:column;gap:14px;max-width:420px}
+.auth-step{display:flex;gap:12px;align-items:flex-start}
+.auth-step-num{width:26px;height:26px;border-radius:50%;background:rgba(253,252,248,.14);display:grid;place-items:center;font-size:12px;font-weight:700;flex-shrink:0}
+.auth-step-text strong{display:block;font-size:13.5px}
+.auth-step-text span{color:rgba(253,252,248,.62);font-size:12px}
+.auth-foot{position:relative;z-index:1;color:rgba(253,252,248,.45);font-family:var(--mono);font-size:10.5px}
+
+.auth-area{display:grid;place-items:center;padding:30px}
+.auth-box{width:100%;max-width:430px}
+.auth-heading{margin-bottom:24px}
+.auth-heading h1{font-size:30px}
+.auth-heading p{margin-top:8px;color:var(--ink-muted);font-size:13.5px}
+
+.pw-row{position:relative}
+.pw-row input{padding-right:70px}
+.pw-toggle{position:absolute;right:6px;top:6px;height:32px;padding:0 12px;border:0;background:transparent;color:var(--ink-muted);font-size:12px;font-weight:700;border-radius:6px}
+.pw-toggle:hover{background:var(--surface-alt)}
+
+.auth-divider{position:relative;margin:20px 0;text-align:center;color:var(--ink-faint);font-size:12.5px}
+.auth-divider::before,.auth-divider::after{content:"";position:absolute;top:50%;width:calc(50% - 70px);height:1px;background:var(--border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+
+.mobile-brand{display:none}
+@media (max-width:900px){
+  .auth-page{grid-template-columns:1fr;padding:0}
+  .auth-intro{display:none}
+  .auth-area{padding:36px 20px}
+  .mobile-brand{display:flex;align-items:center;gap:10px;margin-bottom:30px}
+  .mobile-brand .auth-mark{background:var(--accent-soft);color:var(--accent-dark)}
+  .mobile-brand span{font-family:var(--display);font-size:19px;font-weight:600;color:var(--ink)}
+}
+</style>
+</head>
+<body>
+<div class="auth-page">
+
+  <section class="auth-intro" aria-hidden="true">
+    <div>
+      <div class="auth-brand">
+        <span class="auth-mark">T</span>
+        <span class="auth-brandname">TaskFlow</span>
+      </div>
+      <div class="auth-h1">Start your first list in under a minute.</div>
+      <p class="auth-desc">Create an account to save your tasks, deadlines and reminders across every visit.</p>
+      <div class="auth-steps">
+        <div class="auth-step">
+          <span class="auth-step-num">1</span>
+          <div class="auth-step-text"><strong>Create your account</strong><span>Just your name, email and a password.</span></div>
+        </div>
+        <div class="auth-step">
+          <span class="auth-step-num">2</span>
+          <div class="auth-step-text"><strong>Add your first task</strong><span>Set a priority and a due date.</span></div>
+        </div>
+        <div class="auth-step">
+          <span class="auth-step-num">3</span>
+          <div class="auth-step-text"><strong>Stay on top of it</strong><span>Reminders and an overdue view keep you honest.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-foot">TASKFLOW &middot; YOUR WORK &middot; YOUR DAY</div>
+  </section>
+
+  <main class="auth-area">
+    <div class="auth-box">
+      <div class="mobile-brand"><span class="auth-mark">T</span><span>TaskFlow</span></div>
+
+      <div class="auth-heading">
+        <h1>Create your account</h1>
+        <p>It takes less than a minute.</p>
+      </div>
+
+      {% if error %}
+        <div class="flash flash-error" role="alert" style="margin-bottom:18px">
+          <i class="fa-solid fa-triangle-exclamation"></i><span>{{ error }}</span>
+        </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" value="{{ name or '' }}" required autofocus>
+        </div>
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" value="{{ email or '' }}" required>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="pw-row">
+              <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required>
+              <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password" aria-pressed="false">Show</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="confirm_password">Confirm password</label>
+            <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Re-enter password" minlength="6" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="registerBtn" style="height:46px;margin-top:4px">Create account</button>
+      </form>
+
+      <div class="auth-divider">Already have an account?</div>
+
+      <a href="{{ url_for('login') }}" class="btn btn-secondary btn-block" style="height:46px">Sign in instead</a>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  var pw = document.getElementById("password");
+  var toggle = document.getElementById("pwToggle");
+  toggle.addEventListener("click", function(){
+    var show = pw.type === "password";
+    pw.type = show ? "text" : "password";
+    toggle.textContent = show ? "Hide" : "Show";
+    toggle.setAttribute("aria-pressed", show ? "true" : "false");
+  });
+
+  var form = document.getElementById("registerForm");
+  var btn = document.getElementById("registerBtn");
+  form.addEventListener("submit", function(){
+    if (!form.checkValidity()) return;
+    btn.disabled = true;
+    btn.textContent = "Creating account…";
+  });
+});
+</script>
+</body>
+</html>

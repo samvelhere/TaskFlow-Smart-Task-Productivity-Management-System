@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}TaskFlow | Calendar{% endblock %}
+{% block page_title %}Calendar{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h2 class="section-title">Calendar</h2>
+    <p class="section-subtitle">See what's due, day by day.</p>
+  </div>
+</div>
+
+<div class="cal-toolbar">
+  <div class="cal-nav">
+    <button type="button" class="btn btn-secondary btn-sm" id="calPrev" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="cal-month-label" id="calMonthLabel">&nbsp;</div>
+    <button type="button" class="btn btn-secondary btn-sm" id="calNext" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+  <button type="button" class="btn btn-secondary btn-sm" id="calToday">Today</button>
+</div>
+
+<p class="section-subtitle" style="margin:-10px 0 16px;display:flex;align-items:center;gap:16px">
+  <span style="display:inline-flex;align-items:center;gap:6px"><span class="cal-dot low" style="display:inline-block"></span> Due date</span>
+  <span style="display:inline-flex;align-items:center;gap:6px"><span class="cal-dot low is-reminder" style="display:inline-block"></span> Reminder only</span>
+</p>
+
+<div class="card" id="calCard">
+  <div class="cal-grid" id="calWeekdays"></div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<div class="cal-day-panel" id="calDayPanel" style="display:none">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="calDayTitle" style="font-size:19px">&nbsp;</h2>
+      <p class="section-subtitle" id="calDaySubtitle"></p>
+    </div>
+  </div>
+  <div class="card" id="calDayList"></div>
+</div>
+
+<div class="cal-day-panel">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="calMonthListTitle" style="font-size:19px">&nbsp;</h2>
+      <p class="section-subtitle">Every task due this month, in order.</p>
+    </div>
+  </div>
+  <div class="card" id="calMonthList"></div>
+</div>
+
+<div class="empty" id="calLoading">
+  <i class="fa-solid fa-spinner fa-spin"></i>
+  <h3>Loading your calendar</h3>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='calendar.js') }}"></script>
+{% endblock %}

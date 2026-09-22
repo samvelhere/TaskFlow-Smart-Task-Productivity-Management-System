@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+{% block title %}TaskFlow | Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="welcome-title-wrap">
+  <h1 class="welcome-title">Good to see you, {{ user.name or "there" }}.</h1>
+  <p class="welcome-text">Keep your work organized and stay on top of what needs to be done.</p>
+</section>
+
+<section class="quick-add">
+  <div class="quick-add-content">
+    <div class="quick-add-icon"><i class="fa-solid fa-plus"></i></div>
+    <div>
+      <div class="quick-add-title">What do you need to get done?</div>
+      <div class="quick-add-text">Add a task with a deadline, priority and reminder.</div>
+    </div>
+  </div>
+  <button type="button" class="btn btn-primary" onclick="openModal('createTaskModal')">
+    <i class="fa-solid fa-plus"></i> Add new task
+  </button>
+</section>
+
+<section class="stats-grid" aria-label="Task statistics">
+  <div class="card stat-card">
+    <div class="stat-top"><span class="stat-label">All tasks</span><i class="fa-solid fa-list-check stat-icon"></i></div>
+    <div class="stat-number">{{ tasks|length }}</div>
+    <div class="stat-desc">Tasks in your workspace</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-top"><span class="stat-label">Completed</span><i class="fa-solid fa-circle-check stat-icon"></i></div>
+    <div class="stat-number">{{ tasks|selectattr("status","equalto","completed")|list|length }}</div>
+    <div class="stat-desc">Tasks you have finished</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-top"><span class="stat-label">Still to do</span><i class="fa-regular fa-clock stat-icon"></i></div>
+    <div class="stat-number">{{ tasks|rejectattr("status","in",["completed","overdue"])|list|length }}</div>
+    <div class="stat-desc">Tasks waiting for action</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-top"><span class="stat-label">Overdue</span><i class="fa-solid fa-triangle-exclamation stat-icon"></i></div>
+    <div class="stat-number">{{ tasks|selectattr("status","equalto","overdue")|list|length }}</div>
+    <div class="stat-desc">Tasks past their deadline</div>
+  </div>
+</section>
+
+<section id="tasksSection" style="margin-top:32px">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">My tasks</h2>
+      <p class="section-subtitle">Search, filter and manage your tasks.</p>
+    </div>
+  </div>
+
+  <div class="task-toolbar">
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" id="taskSearch" placeholder="Search tasks…">
+    </div>
+    <select class="filter-select" id="priorityFilter">
+      <option value="">All priorities</option>
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+      <option value="urgent">Urgent</option>
+    </select>
+    <select class="filter-select" id="statusFilter">
+      <option value="">All statuses</option>
+      <option value="not_started">Not started</option>
+      <option value="in_progress">In progress</option>
+      <option value="completed">Completed</option>
+      <option value="overdue">Overdue</option>
+    </select>
+  </div>
+
+  {% if tasks %}
+  <div class="task-list" id="taskList">
+    {% for task in tasks %}
+    <article class="task-card priority-{{ task.priority }} {{ 'is-completed' if task.status == 'completed' }}"
+              data-search="{{ (task.title ~ ' ' ~ (task.description or ''))|lower|e }}"
+              data-priority="{{ task.priority }}"
+              data-status="{{ task.status }}">
+      <div class="task-top">
+        <div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          {% if task.description %}<p class="task-desc">{{ task.description }}</p>{% endif %}
+        </div>
+        <span class="pill pill-{{ task.priority }}">{{ task.priority|capitalize }}</span>
+      </div>
+
+      <div class="task-meta">
+        <span class="pill pill-status {{ task.status }}">{{ task.status.replace('_',' ')|capitalize }}</span>
+        {% if task.due_date %}
+          <span class="task-due {{ 'is-overdue' if task.status == 'overdue' }}">
+            <i class="fa-regular fa-calendar"></i> {{ task.due_date.strftime('%d %b %Y') }}
+          </span>
+        {% else %}
+          <span class="task-due"><i class="fa-regular fa-calendar"></i> No due date</span>
+        {% endif %}
+        {% if task.reminder_at %}
+          <span class="task-due"><i class="fa-regular fa-bell"></i> {{ task.reminder_at.strftime('%d %b, %I:%M %p') }}</span>
+        {% endif %}
+      </div>
+
+      {% if task.status != "completed" %}
+      <div class="task-actions">
+        {% if task.status == "not_started" %}
+        <button type="button" class="btn btn-secondary btn-sm js-confirm"
+                data-url="{{ url_for('start_task', task_id=task.id) }}"
+                data-title="Start this task?"
+                data-entity-title="{{ task.title }}"
+                data-message-template="We'll mark &ldquo;%s&rdquo; as in progress."
+                data-confirm-label="Start task" data-icon="fa-play">
+          <i class="fa-solid fa-play"></i> Start
+        </button>
+        {% endif %}
+
+        <button type="button" class="btn btn-primary btn-sm js-confirm"
+                data-url="{{ url_for('complete_task', task_id=task.id) }}"
+                data-title="Mark task complete?"
+                data-entity-title="{{ task.title }}"
+                data-message-template="&ldquo;%s&rdquo; will move to your completed tasks."
+                data-confirm-label="Mark complete" data-icon="fa-check">
+          <i class="fa-solid fa-check"></i> Complete
+        </button>
+
+        <button type="button" class="btn btn-secondary btn-sm js-confirm"
+                data-url="{{ url_for('continue_tomorrow', task_id=task.id) }}"
+                data-title="Push to tomorrow?"
+                data-entity-title="{{ task.title }}"
+                data-message-template="The due date for &ldquo;%s&rdquo; will move to tomorrow."
+                data-confirm-label="Push to tomorrow" data-icon="fa-forward">
+          <i class="fa-solid fa-forward"></i> Push to tomorrow
+        </button>
+
+        <button type="button" class="btn btn-secondary btn-sm js-reschedule"
+                data-task-id="{{ task.id }}"
+                data-due-date="{{ task.due_date.isoformat() if task.due_date else '' }}"
+                data-task-title="{{ task.title }}">
+          <i class="fa-regular fa-calendar-days"></i> Reschedule
+        </button>
+
+        <button type="button" class="btn btn-ghost btn-sm js-delete-task"
+                data-task-id="{{ task.id }}" data-task-title="{{ task.title }}">
+          <i class="fa-regular fa-trash-can"></i> Delete
+        </button>
+      </div>
+      {% else %}
+      <div class="task-actions">
+        <button type="button" class="btn btn-ghost btn-sm js-delete-task"
+                data-task-id="{{ task.id }}" data-task-title="{{ task.title }}">
+          <i class="fa-regular fa-trash-can"></i> Delete
+        </button>
+      </div>
+      {% endif %}
+
+      <div class="subtask-block">
+        {% if task.total_subtasks %}
+        <div class="subtask-progress-row">
+          <div class="subtask-track"><div class="subtask-fill" style="width:{{ task.subtask_progress }}%"></div></div>
+          <span class="subtask-count">{{ task.completed_subtasks }}/{{ task.total_subtasks }} subtasks</span>
+        </div>
+        {% endif %}
+
+        {% for subtask in task.subtasks %}
+        <div class="subtask-row {{ 'is-done' if subtask.status == 'completed' }}">
+          {% if subtask.status == 'completed' %}
+          <button type="button" class="subtask-check js-confirm" title="Mark as not done" aria-label="Reopen subtask: {{ subtask.title }}"
+                  data-url="{{ url_for('uncomplete_subtask', subtask_id=subtask.id) }}"
+                  data-title="Mark this subtask as not done?"
+                  data-entity-title="{{ subtask.title }}"
+                  data-message-template="&ldquo;%s&rdquo; will move back to your open subtasks."
+                  data-confirm-label="Mark not done" data-icon="fa-rotate-left">
+            <i class="fa-solid fa-check"></i>
+          </button>
+          {% else %}
+          <button type="button" class="subtask-check js-confirm" title="Mark as done" aria-label="Complete subtask: {{ subtask.title }}"
+                  data-url="{{ url_for('complete_subtask', subtask_id=subtask.id) }}"
+                  data-title="Mark this subtask done?"
+                  data-entity-title="{{ subtask.title }}"
+                  data-message-template="&ldquo;%s&rdquo; will be checked off."
+                  data-confirm-label="Mark done" data-icon="fa-check"></button>
+          {% endif %}
+
+          <div class="subtask-name">
+            <div>{{ subtask.title }}</div>
+            {% if subtask.due_date %}
+            <div class="subtask-due {{ 'is-overdue' if (subtask.due_date.isoformat() < today and subtask.status != 'completed') }}">
+              <i class="fa-regular fa-calendar"></i> {{ subtask.due_date.strftime('%d %b %Y') }}
+            </div>
+            {% endif %}
+          </div>
+
+          <button type="button" class="subtask-date-btn js-subtask-date {{ 'has-date' if subtask.due_date }}"
+                  title="Set due date" aria-label="Set due date for subtask: {{ subtask.title }}"
+                  data-subtask-id="{{ subtask.id }}"
+                  data-due-date="{{ subtask.due_date.isoformat() if subtask.due_date else '' }}"
+                  data-subtask-title="{{ subtask.title }}">
+            <i class="fa-regular fa-calendar"></i>
+          </button>
+
+          <button type="button" class="subtask-del js-confirm" aria-label="Delete subtask: {{ subtask.title }}"
+                  data-url="{{ url_for('delete_subtask', subtask_id=subtask.id) }}"
+                  data-title="Delete this subtask?"
+                  data-entity-title="{{ subtask.title }}"
+                  data-message-template="&ldquo;%s&rdquo; will be permanently removed."
+                  data-confirm-label="Delete subtask" data-icon="fa-trash-can" data-danger="true">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        {% endfor %}
+
+        <button type="button" class="btn btn-secondary btn-sm js-add-subtask" style="margin-top:10px"
+                data-task-id="{{ task.id }}" data-task-title="{{ task.title }}">
+          <i class="fa-solid fa-plus"></i> Add subtask
+        </button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <p class="empty" id="noResults" style="display:none">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <h3>No matching tasks</h3>
+    <p>Try a different search term or filter.</p>
+  </p>
+  {% else %}
+  <div class="card empty">
+    <i class="fa-regular fa-square-check"></i>
+    <h3>No tasks yet</h3>
+    <p>Add your first task to get started.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block content_end %}{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+<!-- CREATE TASK MODAL -->
+<div class="modal-overlay" id="createTaskModal" role="dialog" aria-labelledby="createTaskTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="createTaskTitle">Add a new task</h2>
+      <button type="button" class="modal-close" onclick="closeModal('createTaskModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="modal-sub">Give it a title, a priority, and a due date if you have one.</p>
+
+    <form method="POST" action="{{ url_for('add') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="field">
+        <label for="title">Task title</label>
+        <input id="title" name="title" type="text" placeholder="e.g. Finish client proposal" required maxlength="255">
+      </div>
+
+      <div class="field">
+        <label for="description">Description <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+        <textarea id="description" name="description" placeholder="Any extra detail…"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Priority</label>
+        <div class="radio-grid">
+          <label class="radio-card"><input type="radio" name="priority" value="low"> Low</label>
+          <label class="radio-card"><input type="radio" name="priority" value="medium" checked> Medium</label>
+          <label class="radio-card"><input type="radio" name="priority" value="high"> High</label>
+          <label class="radio-card"><input type="radio" name="priority" value="urgent"> Urgent</label>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="start_date">Start date <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+          <input id="start_date" name="start_date" type="date">
+        </div>
+        <div class="field">
+          <label for="due_date">Due date <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+          <input id="due_date" name="due_date" type="date">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="reminder_date">Reminder date <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+          <input id="reminder_date" name="reminder_date" type="date">
+        </div>
+        <div class="field">
+          <label for="reminder_time">Reminder time</label>
+          <input id="reminder_time" name="reminder_time" type="time">
+        </div>
+      </div>
+      <p class="field-hint">Fill in both reminder fields together, or leave both blank.</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('createTaskModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add task</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- RESCHEDULE MODAL -->
+<div class="modal-overlay" id="rescheduleModal" role="dialog" aria-labelledby="rescheduleTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="rescheduleTitle">Reschedule task</h2>
+      <button type="button" class="modal-close" onclick="closeModal('rescheduleModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="modal-sub" id="rescheduleSub">Pick a new due date. The task will be marked in progress.</p>
+
+    <form method="POST" id="rescheduleForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="new_date">New due date</label>
+        <input id="new_date" name="new_date" type="date" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('rescheduleModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save new date</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal" role="dialog" aria-labelledby="deleteTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="deleteTitle">Delete task</h2>
+      <button type="button" class="modal-close" onclick="closeModal('deleteModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="modal-sub" id="deleteSub">This can't be undone. Let us know why, so your activity log stays accurate.</p>
+
+    <form method="POST" id="deleteForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="reason-grid">
+        <label class="radio-card"><input type="radio" name="deletion_reason" value="completed_elsewhere" required> Completed elsewhere</label>
+        <label class="radio-card"><input type="radio" name="deletion_reason" value="no_longer_needed"> No longer needed</label>
+        <label class="radio-card"><input type="radio" name="deletion_reason" value="duplicate"> Duplicate task</label>
+        <label class="radio-card"><input type="radio" name="deletion_reason" value="created_by_mistake"> Created by mistake</label>
+        <label class="radio-card"><input type="radio" name="deletion_reason" value="priority_changed"> Changed priority</label>
+        <label class="radio-card"><input type="radio" name="deletion_reason" value="not_relevant"> Not relevant anymore</label>
+        <label class="radio-card" style="grid-column:1 / -1"><input type="radio" name="deletion_reason" value="other" id="reasonOther"> Other reason</label>
+      </div>
+      <div class="field" id="customReasonField" style="display:none;margin-top:10px">
+        <label for="custom_reason">Tell us more</label>
+        <input id="custom_reason" name="custom_reason" type="text" maxlength="255" placeholder="Why are you deleting this task?">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+        <button type="submit" class="btn btn-danger">Delete task</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- GENERIC CONFIRM MODAL (start/complete/push task, complete/uncomplete/delete subtask) -->
+<div class="modal-overlay" id="confirmActionModal" role="dialog" aria-labelledby="confirmActionTitle">
+  <div class="modal" style="max-width:400px">
+    <div class="confirm-icon" id="confirmActionIcon"><i class="fa-solid fa-check"></i></div>
+    <div class="modal-header" style="margin-bottom:0">
+      <h2 class="modal-title" id="confirmActionTitle">Are you sure?</h2>
+      <button type="button" class="modal-close" onclick="closeModal('confirmActionModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="modal-sub" id="confirmActionMessage">&nbsp;</p>
+
+    <form method="POST" id="confirmActionForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('confirmActionModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="confirmActionSubmit">Confirm</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD SUBTASK MODAL -->
+<div class="modal-overlay" id="addSubtaskModal" role="dialog" aria-labelledby="addSubtaskTitle">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="addSubtaskTitle">Add a subtask</h2>
+      <button type="button" class="modal-close" onclick="closeModal('addSubtaskModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="modal-sub" id="addSubtaskSub">Break this task into a smaller step.</p>
+
+    <form method="POST" id="addSubtaskForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="subtask_title">Subtask title</label>
+        <input id="subtask_title" name="title" type="text" placeholder="e.g. Draft the outline" maxlength="255" required autofocus>
+      </div>
+      <div class="field">
+        <label for="subtask_due_date">Due date <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+        <input id="subtask_due_date" name="due_date" type="date">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addSubtaskModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add subtask</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SUBTASK DATE MODAL -->
+<div class="modal-overlay" id="subtaskDateModal" role="dialog" aria-labelledby="subtaskDateTitle">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="subtaskDateTitle">Set subtask date</h2>
+      <button type="button" class="modal-close" onclick="closeModal('subtaskDateModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="modal-sub" id="subtaskDateSub">Choose a due date for this subtask, or clear it.</p>
+
+    <form method="POST" id="subtaskDateForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="subtask_new_date">Due date</label>
+        <input id="subtask_new_date" name="new_date" type="date">
+      </div>
+      <p class="field-hint">Leave this blank and save to remove the due date.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('subtaskDateModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save date</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

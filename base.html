@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}TaskFlow{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='taskflow.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+<input type="hidden" name="csrf_token" id="csrfTokenGlobal" value="{{ csrf_token() }}" style="display:none">
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('hello') }}">
+      <span class="brand-mark">T</span>
+      <span>
+        <span class="brand-name">TaskFlow</span>
+        <span class="brand-sub">YOUR WORK, YOUR DAY</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a class="nav-link {{ 'active' if request.path == url_for('hello') }}" href="{{ url_for('hello') }}">
+        <i class="fa-solid fa-house"></i><span>Dashboard</span>
+      </a>
+      <a class="nav-link {{ 'active' if request.path == url_for('calendar') }}" href="{{ url_for('calendar') }}">
+        <i class="fa-regular fa-calendar"></i><span>Calendar</span>
+      </a>
+      <a class="nav-link {{ 'active' if request.path == url_for('activity') }}" href="{{ url_for('activity') }}">
+        <i class="fa-solid fa-clock-rotate-left"></i><span>Activity</span>
+      </a>
+      <a class="nav-link {{ 'active' if request.path == url_for('notifications_page') }}" href="{{ url_for('notifications_page') }}">
+        <i class="fa-regular fa-bell"></i><span>Notifications</span>
+        <span class="nav-badge" id="navNotifBadge">0</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="avatar">{{ (user.name[0]|upper) if user and user.name else "U" }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ user.name if user else "User" }}</div>
+          <div class="user-email">{{ user.email if user else "" }}</div>
+        </div>
+        <a class="logout-link" href="{{ url_for('logout') }}" aria-label="Log out" title="Log out">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center">
+        <button type="button" class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Open menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      </div>
+      <div class="topbar-actions">
+        {% block topbar_extra %}{% endblock %}
+        <button type="button" class="icon-btn" id="notifBellBtn" aria-haspopup="true" aria-expanded="false" aria-label="Notifications" title="Notifications">
+          <i class="fa-regular fa-bell"></i>
+          <span class="icon-dot" id="bellDot"></span>
+        </button>
+      </div>
+    </header>
+
+    <div id="notifPanel" class="notif-panel" role="dialog" aria-label="Recent notifications">
+      <div class="notif-panel-head">
+        <h3>Notifications</h3>
+        <a href="{{ url_for('notifications_page') }}" style="font-size:12px;font-weight:700">View all</a>
+      </div>
+      <div id="notifPanelBody">
+        <div class="notif-empty">Loading…</div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ 'success' if category == 'success' else 'error' }}" role="alert">
+              <i class="fa-solid {{ 'fa-circle-check' if category == 'success' else 'fa-triangle-exclamation' }}"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if error %}
+      <div class="flash-stack">
+        <div class="flash flash-error" role="alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>{{ error }}</span>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="page-content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

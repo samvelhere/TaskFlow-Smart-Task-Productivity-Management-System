@@ -1,0 +1,216 @@
+/* ============================================================
+   ACTIVITY LOG
+============================================================ */
+
+.activity-card {
+    overflow: hidden;
+}
+
+
+/* ============================================================
+   DATE GROUP
+============================================================ */
+
+.activity-group-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 17px 0 11px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+
+    line-height: 1.4;
+
+    color: #718096;
+
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    border-bottom: 1px solid #edf0f5;
+}
+
+.activity-group-label i {
+    font-size: 12px;
+    color: #718096;
+}
+
+
+/* ============================================================
+   ACTIVITY ROW
+============================================================ */
+
+.activity-row {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 18px 0;
+
+    border-bottom: 1px solid #edf0f5;
+}
+
+.activity-row:last-child {
+    border-bottom: none;
+}
+
+
+/* ============================================================
+   ACTIVITY DOT
+============================================================ */
+
+.activity-dot {
+    width: 9px;
+    height: 9px;
+
+    min-width: 9px;
+
+    margin-top: 6px;
+
+    border-radius: 50%;
+
+    background: #4f46e5;
+}
+
+.activity-dot.deleted {
+    background: #ef4444;
+}
+
+.activity-dot.overdue {
+    background: #f59e0b;
+}
+
+
+/* ============================================================
+   ACTIVITY CONTENT
+============================================================ */
+
+.activity-line {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* ============================================================
+   ACTIVITY TITLE
+============================================================ */
+
+.activity-title {
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1.5;
+
+    color: #111827;
+}
+
+
+/* ============================================================
+   ACTIVITY DESCRIPTION
+============================================================ */
+
+.activity-detail {
+    margin-top: 4px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 400;
+
+    line-height: 1.5;
+
+    color: #64748b;
+}
+
+
+/* ============================================================
+   DATE + TIME
+============================================================ */
+
+.activity-datetime {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 6px;
+}
+
+
+/* Date and time should be SMALL */
+
+.activity-date,
+.activity-time {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.4;
+
+    color: #94a3b8;
+}
+
+
+/* Icons */
+
+.activity-date i,
+.activity-time i {
+    font-size: 10px;
+
+    color: #94a3b8;
+}
+
+
+/* Small separator */
+
+.activity-date::after {
+    content: "";
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.empty {
+    padding: 60px 20px;
+
+    text-align: center;
+}
+
+.empty > i {
+    margin-bottom: 14px;
+
+    font-size: 30px;
+
+    color: #6366f1;
+}
+
+.empty h3 {
+    margin: 0 0 6px;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+.empty p {
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    color: #64748b;
+}

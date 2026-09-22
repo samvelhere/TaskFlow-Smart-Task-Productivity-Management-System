@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}TaskFlow | Activity{% endblock %}
+{% block page_title %}Activity{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h2 class="section-title">Activity log</h2>
+    <p class="section-subtitle">A record of everything you've done in TaskFlow.</p>
+  </div>
+</div>
+
+<div class="card" style="padding:6px 22px">
+  {% if activities %}
+    {% set ns = namespace(last_label=None) %}
+    {% for item in activities %}
+      {% set group_label = item.created_at.strftime('%d %b %Y') if item.created_at else "Unknown date" %}
+      {% if group_label != ns.last_label %}
+        <div class="activity-group-label">{{ group_label }}</div>
+        {% set ns.last_label = group_label %}
+      {% endif %}
+      <div class="activity-row">
+        <span class="activity-dot {{ 'deleted' if item.action_type == 'deleted' else ('overdue' if item.action_type == 'overdue' else '') }}"></span>
+        <div class="activity-line">
+          <div class="activity-title">{{ item.title }}</div>
+          {% if item.details %}<div class="activity-detail">{{ item.details }}</div>{% endif %}
+          <div class="activity-time">{{ item.created_at.strftime('%I:%M %p') if item.created_at else "" }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <h3>No activity yet</h3>
+      <p>Actions you take in TaskFlow will show up here.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
